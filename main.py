@@ -1,6 +1,7 @@
 import pygame
 
 pygame.init()
+pygame.font.init()
 WIDTH = 1280
 HEIGHT = 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -11,6 +12,13 @@ dt = 0
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_zone = pygame.Vector2(400, 600)
 opponent_zone = pygame.Vector2(800, 200)
+menu_width, menu_height = (180, 80)
+
+menu = [pygame.Rect(800, 500, menu_width, menu_height), 
+        pygame.Rect(1000, 500, menu_width, menu_height), 
+        pygame.Rect(800, 600, menu_width, menu_height), 
+        pygame.Rect(1000, 600, menu_width, menu_height)] 
+
 
 def render():
     screen.fill("purple")
@@ -18,7 +26,34 @@ def render():
     
     pygame.draw.circle(screen, "green", player_zone, 100)
     pygame.draw.circle(screen, "green", opponent_zone, 100)
-    
+
+    pygame.draw.rect(screen, "grey", menu[0])
+    pygame.draw.rect(screen, "grey", menu[1])
+    pygame.draw.rect(screen, "grey", menu[2])
+    pygame.draw.rect(screen, "grey", menu[3])
+
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    menu1 = font.render("Fight", True, (255, 255, 255), 'grey')
+    menu2 = font.render("Team", True, (255, 255, 255), 'grey')
+    menu3 = font.render("Center", True, (255, 255, 255), 'grey')
+    menu4 = font.render("Flee", True, (255, 255, 255), 'grey')
+
+    menu1_rect = menu1.get_rect()
+    menu2_rect = menu2.get_rect()
+    menu3_rect = menu3.get_rect()
+    menu4_rect = menu4.get_rect()
+
+    menu1_rect.center = (800 + menu_width // 2, 500 + menu_height // 2)
+    menu2_rect.center = (1000 + menu_width // 2, 500 + menu_height // 2)
+    menu3_rect.center = (800 + menu_width // 2, 600 + menu_height // 2)
+    menu4_rect.center = (1000 + menu_width // 2, 600 + menu_height // 2)
+
+    screen.blit(menu1, menu1_rect)
+    screen.blit(menu2, menu2_rect)
+    screen.blit(menu3, menu3_rect)
+    screen.blit(menu4, menu4_rect)
+
+
     pygame.display.flip()
 
 def update():
@@ -50,4 +85,5 @@ def main_loop():
 
 if __name__ == "__main__":
     main_loop()
+    pygame.font.quit()
     pygame.quit()
