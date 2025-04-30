@@ -9,6 +9,9 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 
+attack = False
+battle = False
+
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 player_zone = pygame.Vector2(400, 600)
 opponent_zone = pygame.Vector2(800, 200)
@@ -19,22 +22,23 @@ menu = [pygame.Rect(800, 500, menu_width, menu_height),
         pygame.Rect(800, 600, menu_width, menu_height), 
         pygame.Rect(1000, 600, menu_width, menu_height)] 
 
+a_x, a_y = 800, 500
+a_r = pygame.Rect(a_x + 50, a_y + 50, 50, 50)
+
 battle_ground_player = pygame.Rect(200, 400, 400, 200)
 battle_ground_opponent = pygame.Rect(800, 200, 400, 160)
 
-def render():
-    screen.fill("purple")
-    pygame.draw.circle(screen, "white", player_pos, 20)
-    
-    pygame.draw.ellipse(screen, "green", battle_ground_player, 0)
-    pygame.draw.ellipse(screen, "green", battle_ground_opponent, 0)
+font = pygame.font.Font('freesansbold.ttf', 32)
 
+def render_battle():
     pygame.draw.rect(screen, "grey", menu[0])
     pygame.draw.rect(screen, "grey", menu[1])
     pygame.draw.rect(screen, "grey", menu[2])
     pygame.draw.rect(screen, "grey", menu[3])
 
-    font = pygame.font.Font('freesansbold.ttf', 32)
+    pygame.draw.ellipse(screen, "green", battle_ground_player, 0)
+    pygame.draw.ellipse(screen, "green", battle_ground_opponent, 0)
+
     menu1 = font.render("Fight", True, (255, 255, 255), 'grey')
     menu2 = font.render("Team", True, (255, 255, 255), 'grey')
     menu3 = font.render("Settings", True, (255, 255, 255), 'grey')
@@ -55,11 +59,24 @@ def render():
     screen.blit(menu3, menu3_rect)
     screen.blit(menu4, menu4_rect)
 
+def render():
+    screen.fill("purple")
+    pygame.draw.circle(screen, "white", player_pos, 20)
+
+    if battle:
+        render_battle()
+
+    if attack:
+        pygame.draw.rect(screen, "red", a_r)
+        a_r.y -= 1000 * dt
+        a_r.x += 1000 * dt
+
 
     pygame.display.flip()
 
 def update():
     global dt
+    global battle
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
         player_pos.y -= 300 * dt
@@ -70,25 +87,28 @@ def update():
     if keys[pygame.K_d]:
         player_pos.x += 300 * dt
 
-    dt = clock.tick(60) / 1000
+    if player_pos.y >= HEIGHT:
+        battle = True
+    else:
+        battle = False
 
-def attack():
-    print("ATTACK")
+    dt = clock.tick(60) / 1000
 
 def processEvents():
     global running
+    global attack
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
-                if x > 800 and x < 800 + menu_width and y > 500 and y < 500 + menu_height:
-                    attack()
-                elif x > 1000 and x < 1000 + menu_width and y > 500 and y < 500 + menu_height:
+                if menu[0].contains(pygame.Rect(x, y, 1, 1)):
+                    attack = True
+                elif menu[1].contains(pygame.Rect(x, y, 1, 1)):
                     print("Team")
-                elif x > 800 and x < 800 + menu_width and y > 600 and y < 600 + menu_height:
+                elif menu[2].contains(pygame.Rect(x, y, 1, 1)):
                     print("Settings")
-                elif x > 1000 and x < 1000 + menu_width and y > 600 and y < 600 + menu_height:
+                elif menu[3].contains(pygame.Rect(x, y, 1, 1)):
                     print("Flee")
 
 def main_loop():
